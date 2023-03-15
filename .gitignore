@@ -1,0 +1,7 @@
+# IDE
+.idea/
+.vs/
+cmake-build-*/
+out/
+CMakeSettings.json
+CMakePresets.json

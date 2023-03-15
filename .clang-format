@@ -1,0 +1,8 @@
+---
+Language: Cpp
+BasedOnStyle: Chromium
+AlignEscapedNewlines: Left
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: BeforeComma
+IndentPPDirectives: AfterHash
+IndentWidth: '4'
