@@ -4,11 +4,49 @@ File Handle Finder is a command-line tool to search and close file handles for a
 
 ## Features
 
-- Search for file handles by file name or pattern using `*` and `?` wildcards
-    - `*` matches any sequence of characters
-    - `?` matches any single character
-- Close file handles (with a confirmation prompt or automatic confirmation option)
-- Supports enabling debug privilege for the process
+- Search for file handles using a pattern search or a regex search
+- Close file handles
+
+## Usage
+
+```bash
+file-handle-closer.exe <query> [-c/--close] [-y/--yes] [-r/--regex]
+```
+
+## Examples
+
+### Pattern search (default)
+
+Search for file handles with names that end with "file.txt".
+
+```bash
+file-handle-closer.exe "*file.txt"
+```
+
+### Regex search
+
+Search for file handles with names that match the regex pattern "file\.[a-zA-Z]{3}$". (e.g. file.txt, file.doc,
+file.pdf, etc.)
+
+```bash
+file-handle-closer.exe "file\.[a-zA-Z]{3}$" -r
+```
+
+### Close file handles
+
+Close file handles with names that end with "file.txt".
+
+```bash
+file-handle-closer.exe "*file.txt" -c
+```
+
+### Automatically answer yes to prompts
+
+Close file handles with names that end with "file.txt" and automatically answer yes to prompts.
+
+```bash
+file-handle-closer.exe "*file.txt" -c -y
+```
 
 ## Requirements
 
@@ -43,32 +81,6 @@ cmake --build .
 ```
 
 Alternatively, you can open the generated solution in Visual Studio or use your preferred C++ compiler.
-
-## Usage
-
-### Basic usage
-
-Search for file handles by file name or pattern:
-
-```bash
-file-handle-closer.exe "file.txt"
-```
-
-### Closing file handles
-
-To close the found file handles, use the `-c` or `--close` option:
-
-```bash
-file-handle-closer.exe "file.txt" -c
-```
-
-### Automatic confirmation
-
-To close the found file handles without a confirmation prompt, use the `-y` or `yes` option:
-
-```bash
-file-handle-closer.exe "file.txt" -c -y
-```
 
 ## Disclaimer
 
