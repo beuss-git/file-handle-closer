@@ -11,7 +11,7 @@
 #include "utils/debug_privileges.hpp"
 #include "utils/string_utils.hpp"
 
-bool verify_unlock();
+bool verify_action(std::string const& message);
 
 void enable_virtual_terminal_processing();
 
@@ -26,6 +26,10 @@ int main(int argc, char* argv[]) {
         .required();
     program.add_argument("-c", "--close")
         .help("close file handle(s)")
+        .default_value(false)
+        .implicit_value(true);
+    program.add_argument("-k", "--kill")
+        .help("kill process(es) that have the file handle(s) open")
         .default_value(false)
         .implicit_value(true);
     program.add_argument("-y", "--yes")
@@ -63,7 +67,8 @@ int main(int argc, char* argv[]) {
         std::cerr << "Failed to convert search query to UTF-16\n";
         return 1;
     }
-    auto const should_unlock = program.get<bool>("--close");
+    auto const should_close = program.get<bool>("--close");
+    auto const should_kill = program.get<bool>("--kill");
     auto const auto_yes = program.get<bool>("--yes");
     auto const use_regex = program.get<bool>("--regex");
 
@@ -92,11 +97,23 @@ int main(int argc, char* argv[]) {
                 file_handle.file_name);
             std::wcout << output << "\n";
 
-            if (should_unlock && (auto_yes || verify_unlock())) {
-                if (close_handle(file_handle)) {
-                    std::cout << "[+] Unlocked handle\n";
-                } else {
-                    std::cerr << "[-] Failed to unlock handle\n";
+            if (should_close) {
+                if (auto_yes || verify_action("Are you sure you want to close "
+                                              "the file handle? (Y/n): ")) {
+                    if (close_handle(file_handle)) {
+                        std::cout << "[+] Closed handle\n";
+                    } else {
+                        std::cerr << "[-] Failed to close handle\n";
+                    }
+                }
+            } else if (should_kill) {
+                if (auto_yes || verify_action("Are you sure you want to kill "
+                                              "the process? (Y/n): ")) {
+                    if (kill_process(file_handle)) {
+                        std::cout << "[+] Killed process\n";
+                    } else {
+                        std::cerr << "[-] Failed to kill process\n";
+                    }
                 }
             }
         }
@@ -109,12 +126,12 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-bool verify_unlock() {
-    std::cout << "Are you sure you want to unlock the file handle(s)? (Y/n): ";
+bool verify_action(std::string const& message) {
+    std::cout << message;
     auto const c = static_cast<char>(_getch());
     std::cout << c << "\n\n";
 
-    return toupper(c) == 'Y' || c == '\n';
+    return toupper(c) == 'Y' || c == '\n' || c == '\r';
 }
 
 void enable_virtual_terminal_processing() {

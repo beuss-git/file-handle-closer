@@ -13,4 +13,5 @@ struct HandleInfo {
 
 std::vector<HandleInfo> get_file_handles();
 
-bool close_handle(const HandleInfo& handle);
+bool close_handle(HandleInfo const& handle);
+bool kill_process(HandleInfo const& handle);

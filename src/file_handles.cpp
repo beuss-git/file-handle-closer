@@ -206,3 +206,21 @@ bool close_handle(HandleInfo const& handle) {
 
     return true;
 }
+
+bool kill_process(HandleInfo const& handle) {
+    const utils::HandleGuard process_handle(
+        OpenProcess(PROCESS_TERMINATE, TRUE, handle.process_id));
+
+    if (!process_handle) {
+        return false;
+    }
+
+    if (!TerminateProcess(process_handle.get(), 0)) {
+        std::cerr << std::format("TerminateProcess failed with error: {}",
+                                 GetLastError())
+                  << "\n";
+        return false;
+    }
+
+    return true;
+}
