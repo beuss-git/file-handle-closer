@@ -9,7 +9,7 @@ class RegexSearch : public SearchStrategy {
    public:
     static std::unique_ptr<RegexSearch> create(std::wstring const& pattern);
 
-    bool match(std::wstring const& str) override;
+    Matches match(std::wstring const& str) override;
 
    private:
     std::wregex m_regex_pattern;

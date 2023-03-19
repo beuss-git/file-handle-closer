@@ -7,7 +7,7 @@ class PatternSearch : public SearchStrategy {
 
    public:
     static std::unique_ptr<PatternSearch> create(std::wstring const& pattern);
-    bool match(std::wstring const& str) override;
+    Matches match(std::wstring const& str) override;
 
    private:
     std::wstring m_pattern;

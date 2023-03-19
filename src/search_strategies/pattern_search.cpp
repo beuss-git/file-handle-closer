@@ -1,4 +1,5 @@
 #include "pattern_search.hpp"
+#include <iostream>
 
 std::unique_ptr<PatternSearch> PatternSearch::create(
     std::wstring const& pattern) {
@@ -10,7 +11,7 @@ std::unique_ptr<PatternSearch> PatternSearch::create(
     instance->m_pattern = pattern;
     // Add implicit * at the beginning of the pattern
     if (instance->m_pattern[0] != L'*') {
-        instance->m_pattern =  L"*" + instance->m_pattern;
+        instance->m_pattern = L"*" + instance->m_pattern;
     }
     // Add implicit * at the end of the pattern
     if (instance->m_pattern[instance->m_pattern.size() - 1] != L'*') {
@@ -18,14 +19,18 @@ std::unique_ptr<PatternSearch> PatternSearch::create(
     }
     return instance;
 }
-bool PatternSearch::match(std::wstring const& str) {
+SearchStrategy::Matches PatternSearch::match(std::wstring const& str) {
     size_t str_index = 0, pattern_index = 0;
     size_t star_index = std::wstring::npos, str_tmp_index = 0;
+    size_t match_start = 0;
 
-    while (str_index < str.size()) {
+    while (str_index <= str.size()) {
         if (pattern_index < m_pattern.size() &&
             (str[str_index] == m_pattern[pattern_index] ||
              m_pattern[pattern_index] == L'?')) {
+            if (pattern_index == 1) {
+                match_start = str_index;
+            }
             str_index++;
             pattern_index++;
         } else if (pattern_index < m_pattern.size() &&
@@ -36,14 +41,12 @@ bool PatternSearch::match(std::wstring const& str) {
             pattern_index = star_index + 1;
             str_index = ++str_tmp_index;
         } else {
-            return false;
+            break;
+        }
+
+        if (pattern_index == m_pattern.size()) {
+            return Matches{{match_start, str_index}};
         }
     }
-
-    while (pattern_index < m_pattern.size() &&
-           m_pattern[pattern_index] == L'*') {
-        pattern_index++;
-    }
-
-    return pattern_index == m_pattern.size();
+    return {};
 }

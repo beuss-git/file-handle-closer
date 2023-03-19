@@ -15,6 +15,10 @@ bool verify_action(std::string const& message);
 
 void enable_virtual_terminal_processing();
 
+std::wstring create_highlighted_file_name(
+    std::wstring const& file_name,
+    SearchStrategy::Matches const& matches);
+
 int main(int argc, char* argv[]) {
     enable_virtual_terminal_processing();
 
@@ -85,16 +89,17 @@ int main(int argc, char* argv[]) {
     bool found = false;
 
     for (auto const& file_handle : file_handles) {
-        if (search_strategy->match(file_handle.file_name)) {
+        if (auto const matches = search_strategy->match(file_handle.file_name);
+            !matches.empty()) {
             found = true;
 
             const std::wstring output = std::format(
                 L"[-] Process: 0x{:X} ({})\n"
                 L"    Handle:  0x{:X}\n"
-                L"    File:    \033[1m{}\033[0m",
+                L"    File:    {}",
                 file_handle.process_id, file_handle.process_name,
                 reinterpret_cast<uintptr_t>(file_handle.file_handle),
-                file_handle.file_name);
+                create_highlighted_file_name(file_handle.file_name, matches));
             std::wcout << output << "\n";
 
             if (should_close) {
@@ -147,4 +152,26 @@ void enable_virtual_terminal_processing() {
 
     // Set the new mode.
     SetConsoleMode(h_out, dw_mode);
+}
+
+std::wstring create_highlighted_file_name(
+    std::wstring const& file_name,
+    SearchStrategy::Matches const& matches) {
+    std::wstring highlighted_string;
+    highlighted_string.reserve(
+        file_name.size() + matches.size() * 2);  // 2 for the escape sequences
+
+    std::wstring highlighted_file_name;
+    size_t start_pos = 0;
+    for (auto const& match : matches) {
+        highlighted_file_name +=
+            file_name.substr(start_pos, match.start - start_pos);
+        highlighted_file_name += L"\033[94m";
+        highlighted_file_name +=
+            file_name.substr(match.start, match.end - match.start);
+        highlighted_file_name += L"\033[0m";
+        start_pos = match.end;
+    }
+
+    return highlighted_file_name;
 }
