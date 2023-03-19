@@ -40,6 +40,14 @@ Close file handles with names that end with "file.txt".
 file-handle-closer.exe "*file.txt" -c
 ```
 
+### Kill processes
+
+Kill file handle owner processes with names that end with "file.txt".
+
+```bash
+file-handle-closer.exe "*file.txt" -k
+```
+
 ### Automatically answer yes to prompts
 
 Close file handles with names that end with "file.txt" and automatically answer yes to prompts.
