@@ -4,7 +4,9 @@ File Handle Finder is a command-line tool to search and close file handles for a
 
 ## Features
 
-- Search for file handles by file name or pattern
+- Search for file handles by file name or pattern using `*` and `?` wildcards
+    - `*` matches any sequence of characters
+    - `?` matches any single character
 - Close file handles (with a confirmation prompt or automatic confirmation option)
 - Supports enabling debug privilege for the process
 

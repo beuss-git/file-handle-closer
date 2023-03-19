@@ -11,6 +11,7 @@
 bool verify_unlock();
 
 void enable_virtual_terminal_processing();
+bool pattern_match(const std::wstring& str, const std::wstring& pattern);
 
 int main(int argc, char* argv[]) {
     enable_virtual_terminal_processing();
@@ -60,11 +61,12 @@ int main(int argc, char* argv[]) {
     auto const auto_yes = program.get<bool>("--yes");
 
     bool found = false;
+
     for (auto const& file_handle : file_handles) {
-        if (file_handle.file_name.find(*search_query) != std::wstring::npos) {
+        if (pattern_match(file_handle.file_name, *search_query)) {
             found = true;
 
-            std::wstring output = std::format(
+            const std::wstring output = std::format(
                 L"[-] Process: 0x{:X} ({})\n"
                 L"    Handle:  0x{:X}\n"
                 L"    File:    \033[1m{}\033[0m",
@@ -111,4 +113,33 @@ void enable_virtual_terminal_processing() {
 
     // Set the new mode.
     SetConsoleMode(h_out, dw_mode);
+}
+
+bool pattern_match(const std::wstring& str, const std::wstring& pattern) {
+    size_t str_index = 0, pattern_index = 0;
+    size_t star_index = std::wstring::npos, str_tmp_index = 0;
+
+    while (str_index < str.size()) {
+        if (pattern_index < pattern.size() &&
+            (str[str_index] == pattern[pattern_index] ||
+             pattern[pattern_index] == L'?')) {
+            str_index++;
+            pattern_index++;
+        } else if (pattern_index < pattern.size() &&
+                   pattern[pattern_index] == L'*') {
+            star_index = pattern_index++;
+            str_tmp_index = str_index;
+        } else if (star_index != std::wstring::npos) {
+            pattern_index = star_index + 1;
+            str_index = ++str_tmp_index;
+        } else {
+            return false;
+        }
+    }
+
+    while (pattern_index < pattern.size() && pattern[pattern_index] == L'*') {
+        pattern_index++;
+    }
+
+    return pattern_index == pattern.size();
 }
