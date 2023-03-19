@@ -6,3 +6,4 @@ BreakBeforeBraces: Custom
 BreakConstructorInitializers: BeforeComma
 IndentPPDirectives: AfterHash
 IndentWidth: '4'
+QualifierAlignment: Right
