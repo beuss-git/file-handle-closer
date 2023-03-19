@@ -3,7 +3,19 @@
 std::unique_ptr<PatternSearch> PatternSearch::create(
     std::wstring const& pattern) {
     auto instance = std::unique_ptr<PatternSearch>(new PatternSearch());
+    if (pattern.empty()) {
+        return nullptr;
+    }
+
     instance->m_pattern = pattern;
+    // Add implicit * at the beginning of the pattern
+    if (instance->m_pattern[0] != L'*') {
+        instance->m_pattern =  L"*" + instance->m_pattern;
+    }
+    // Add implicit * at the end of the pattern
+    if (instance->m_pattern[instance->m_pattern.size() - 1] != L'*') {
+        instance->m_pattern += L"*";
+    }
     return instance;
 }
 bool PatternSearch::match(std::wstring const& str) {

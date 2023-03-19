@@ -17,10 +17,16 @@ file-handle-closer.exe <query> [-c/--close] [-y/--yes] [-r/--regex]
 
 ### Pattern search (default)
 
-Search for file handles with names that end with "file.txt".
+Search for file handles with names that contain "file.txt".
 
 ```bash
-file-handle-closer.exe "*file.txt"
+file-handle-closer.exe "file.txt"
+```
+
+Search for Nvidia logs files
+
+```bash
+file-handle-closer.exe "NVIDIA*.log"
 ```
 
 ### Regex search
@@ -37,7 +43,7 @@ file-handle-closer.exe "file\.[a-zA-Z]{3}$" -r
 Close file handles with names that end with "file.txt".
 
 ```bash
-file-handle-closer.exe "*file.txt" -c
+file-handle-closer.exe "file.txt" -c
 ```
 
 ### Kill processes
@@ -45,7 +51,7 @@ file-handle-closer.exe "*file.txt" -c
 Kill file handle owner processes with names that end with "file.txt".
 
 ```bash
-file-handle-closer.exe "*file.txt" -k
+file-handle-closer.exe "file.txt" -k
 ```
 
 ### Automatically answer yes to prompts
@@ -53,7 +59,7 @@ file-handle-closer.exe "*file.txt" -k
 Close file handles with names that end with "file.txt" and automatically answer yes to prompts.
 
 ```bash
-file-handle-closer.exe "*file.txt" -c -y
+file-handle-closer.exe "file.txt" -c -y
 ```
 
 ## Requirements
