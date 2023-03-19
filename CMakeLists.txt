@@ -14,7 +14,14 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(argparse)
 
-add_executable(${PROJECT_NAME} "src/main.cpp" "src/file_handles.cpp" "src/utils/debug_privileges.cpp" "src/nt/nt_functions.cpp")
+add_executable(${PROJECT_NAME}
+        "src/main.cpp"
+        "src/search_strategies/regex_search.cpp"
+        "src/search_strategies/pattern_search.cpp"
+        "src/file_handles.cpp"
+        "src/utils/debug_privileges.cpp"
+        "src/nt/nt_functions.cpp"
+        )
 target_link_libraries(${PROJECT_NAME} argparse)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

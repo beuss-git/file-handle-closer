@@ -2,16 +2,18 @@
 #include <argparse/argparse.hpp>
 #include <format>
 #include <iostream>
+#include <memory>
 
 #include "file_Handles.hpp"
 #include "nt/nt_functions.hpp"
+#include "search_strategies/pattern_search.hpp"
+#include "search_strategies/regex_search.hpp"
 #include "utils/debug_privileges.hpp"
 #include "utils/string_utils.hpp"
 
 bool verify_unlock();
 
 void enable_virtual_terminal_processing();
-bool pattern_match(const std::wstring& str, const std::wstring& pattern);
 
 int main(int argc, char* argv[]) {
     enable_virtual_terminal_processing();
@@ -28,6 +30,10 @@ int main(int argc, char* argv[]) {
         .implicit_value(true);
     program.add_argument("-y", "--yes")
         .help("automatically answer yes to all prompts (not recommended)")
+        .default_value(false)
+        .implicit_value(true);
+    program.add_argument("-r", "--regex")
+        .help("use regular expressions for search query")
         .default_value(false)
         .implicit_value(true);
 
@@ -59,11 +65,22 @@ int main(int argc, char* argv[]) {
     }
     auto const should_unlock = program.get<bool>("--close");
     auto const auto_yes = program.get<bool>("--yes");
+    auto const use_regex = program.get<bool>("--regex");
+
+    std::unique_ptr<SearchStrategy> search_strategy;
+    if (use_regex) {
+        search_strategy = RegexSearch::create(*search_query);
+    } else {
+        search_strategy = PatternSearch::create(*search_query);
+    }
+    if (!search_strategy) {
+        return 1;
+    }
 
     bool found = false;
 
     for (auto const& file_handle : file_handles) {
-        if (pattern_match(file_handle.file_name, *search_query)) {
+        if (search_strategy->match(file_handle.file_name)) {
             found = true;
 
             const std::wstring output = std::format(
@@ -113,33 +130,4 @@ void enable_virtual_terminal_processing() {
 
     // Set the new mode.
     SetConsoleMode(h_out, dw_mode);
-}
-
-bool pattern_match(const std::wstring& str, const std::wstring& pattern) {
-    size_t str_index = 0, pattern_index = 0;
-    size_t star_index = std::wstring::npos, str_tmp_index = 0;
-
-    while (str_index < str.size()) {
-        if (pattern_index < pattern.size() &&
-            (str[str_index] == pattern[pattern_index] ||
-             pattern[pattern_index] == L'?')) {
-            str_index++;
-            pattern_index++;
-        } else if (pattern_index < pattern.size() &&
-                   pattern[pattern_index] == L'*') {
-            star_index = pattern_index++;
-            str_tmp_index = str_index;
-        } else if (star_index != std::wstring::npos) {
-            pattern_index = star_index + 1;
-            str_index = ++str_tmp_index;
-        } else {
-            return false;
-        }
-    }
-
-    while (pattern_index < pattern.size() && pattern[pattern_index] == L'*') {
-        pattern_index++;
-    }
-
-    return pattern_index == pattern.size();
 }
