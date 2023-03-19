@@ -15,7 +15,7 @@ void enable_virtual_terminal_processing();
 int main(int argc, char* argv[]) {
     enable_virtual_terminal_processing();
 
-    argparse::ArgumentParser program("File Handle Finder");
+    argparse::ArgumentParser program("File Handle Closer");
 
     // Non-positional argument with no name
     program.add_argument("query")
