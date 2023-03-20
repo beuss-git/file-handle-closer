@@ -76,12 +76,15 @@ int main(int argc, char* argv[]) {
     auto const auto_yes = program.get<bool>("--yes");
     auto const use_regex = program.get<bool>("--regex");
 
-    std::unique_ptr<SearchStrategy> search_strategy;
-    if (use_regex) {
-        search_strategy = RegexSearch::create(*search_query);
-    } else {
-        search_strategy = PatternSearch::create(*search_query);
-    }
+    auto const search_strategy =
+        [use_regex, search_query]() -> std::unique_ptr<SearchStrategy> {
+        if (use_regex) {
+            return RegexSearch::create(*search_query);
+        } else {
+            return PatternSearch::create(*search_query);
+        }
+    }();
+
     if (!search_strategy) {
         return 1;
     }
