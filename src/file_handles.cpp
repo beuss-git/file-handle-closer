@@ -72,7 +72,8 @@ std::wstring canonicalize_nt_path_name(std::wstring const& nt_path_name) {
                 std::wstring_view{lower_nt_drive_name.data(),
                                   std::wcslen(lower_nt_drive_name.c_str())};
 
-            if (lower_nt_path_name.find(view) != std::string::npos) {
+            // Check that it starts with the drive name
+            if (lower_nt_path_name.find(view) == 0) {
                 canonicalized = std::format(L"{}{}", drive,
                                             nt_path_name.substr(view.length()));
                 break;
