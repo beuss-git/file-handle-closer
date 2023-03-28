@@ -40,7 +40,7 @@ file-handle-closer.exe "file\.[a-zA-Z]{3}$" -r
 
 ### Close file handles
 
-Close file handles with names that end with "file.txt".
+Close file handles with names that contain "file.txt".
 
 ```bash
 file-handle-closer.exe "file.txt" -c
@@ -48,7 +48,7 @@ file-handle-closer.exe "file.txt" -c
 
 ### Kill processes
 
-Kill file handle owner processes with names that end with "file.txt".
+Kill file handle owner processes with names that contain "file.txt".
 
 ```bash
 file-handle-closer.exe "file.txt" -k
@@ -56,7 +56,7 @@ file-handle-closer.exe "file.txt" -k
 
 ### Automatically answer yes to prompts
 
-Close file handles with names that end with "file.txt" and automatically answer yes to prompts.
+Close file handles with names that contain "file.txt" and automatically answer yes to prompts.
 
 ```bash
 file-handle-closer.exe "file.txt" -c -y
