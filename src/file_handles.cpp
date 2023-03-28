@@ -53,18 +53,21 @@ std::wstring canonicalize_nt_path_name(std::wstring const& nt_path_name) {
 
     std::wstring lower_nt_path_name = utils::to_lower(nt_path_name);
 
+    const std::wstring nt_drive_name(MAX_PATH + 1, '\0');
+
     if (const DWORD drive_mask = GetLogicalDrives()) {
         for (int i = 0; i < 26; ++i) {
+            // Check if the drive is present
             if (!(drive_mask & (1 << i)))
                 continue;
-            const std::wstring drive =
-                std::format(L"{}:", static_cast<wchar_t>('A' + i));
-            const std::wstring nt_drive_name(MAX_PATH + 1, '\0');
 
-            if (QueryDosDeviceW(drive.c_str(),
+            wchar_t drive[] = {static_cast<wchar_t>(L'A' + i), L':',
+                                      L'\0'};
+            if (QueryDosDeviceW(drive,
                                 const_cast<wchar_t*>(nt_drive_name.c_str()),
-                                MAX_PATH) == 0)
+                                MAX_PATH) == 0) {
                 continue;
+            }
 
             auto const lower_nt_drive_name = utils::to_lower(nt_drive_name);
             // Remove the trailing null characters to do the comparison
